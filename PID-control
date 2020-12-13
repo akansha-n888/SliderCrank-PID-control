@@ -1,0 +1,115 @@
+#include <Servo.h>
+#include <PID_v1.h>
+
+double SetPoint, Input, Output;
+double Kp = 1.5, Ki = 0.01, Kd = 0;
+const int trigPin = 11;
+const int echoPin = 12;
+
+float duration;
+double distance, x;
+
+float r = 6, L = 6.5, offset = 1.5, sd = 17.5;
+float theta, b;
+int thetadeg;
+
+Servo myServo;
+PID PID_control(&Input, &Output, &SetPoint, Kp, Ki, Kd, DIRECT);
+
+void setup() {
+  //initialize ultrasonic sensor and pushbuttons
+  pinMode(trigPin, OUTPUT);           //ultrasonic sensor trig pin
+  pinMode(echoPin, INPUT);            //ultrasonic sensor echo pin
+  pinMode(2, INPUT_PULLUP);     //push button 1
+  pinMode(3, INPUT_PULLUP);     //push button 2
+
+  myServo.attach(7);
+
+  SetPoint = 6.5;          //determined from calibration code
+  
+  //set up PID parameters
+  Serial.begin(56000);
+  Serial.setTimeout(200);
+  PID_control.SetMode(AUTOMATIC);
+  PID_control.SetTunings(Kp, Ki, Kd);
+
+  attachInterrupt(digitalPinToInterrupt(2),increase,FALLING);
+  attachInterrupt(digitalPinToInterrupt(3),decrease,FALLING);
+
+}
+
+void loop() {
+  distance = calculateDistance();
+  Input = distance - offset;
+  delay(10);
+  
+  double error = SetPoint - Input;
+  
+  PID_control.Compute();              //calculates the Ouput Value
+
+    thetadeg = distance2angle(Output);
+    myServo.write(thetadeg);
+    
+  //serial plot to match input and setpoint
+  /*Serial.print("Sensor Distance:");
+  Serial.print(distance);
+  Serial.print("  ");
+  delay(10);*/
+  /*Serial.print("Linkage Distance:");
+  Serial.print(abs(x));
+  Serial.print("  ");
+  delay(10);*/
+  Serial.print("Input:");
+  Serial.print(Input);
+  Serial.print("  ");
+  delay(10);
+ /* Serial.print("Error:");
+  Serial.print(error);
+  Serial.print("  ");
+  delay(10);*/
+  Serial.print("Output:");
+  Serial.print(Output);
+  Serial.print("  ");
+  delay(10);
+  /*Serial.print("Servo Angle:");
+  Serial.print(thetadeg);
+  Serial.print("  ");
+  delay(10);*/
+  Serial.print("SetPoint:");
+  Serial.println(SetPoint);
+  delay(10);
+
+}
+
+float calculateDistance() {
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPin, LOW);
+  duration = pulseIn(echoPin, HIGH);
+  distance = duration * 0.034 / 2;
+  return distance;
+}
+
+float distance2angle(float distance){
+  r = 4.0; L = 6.2; offset = 1.5; sd = 16.0;
+  x = sd - distance - offset;
+  b = (pow(r,2)+pow(x,2)-pow(L,2))/(2*r*x);
+  
+  if (b>1){
+      b<1;}
+  
+  theta = acos(b);        
+      
+  thetadeg = theta *(180/PI);
+  return thetadeg;
+  }
+  
+void increase(){
+  SetPoint = SetPoint + 0.1;
+}
+
+void decrease(){
+  SetPoint = SetPoint - 0.1;
+}
