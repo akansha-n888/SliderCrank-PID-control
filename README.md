@@ -4,6 +4,7 @@
 ## Table of contents
 * [General info](#general-info)
 * [Technologies](#technologies)
+* [Design Schematic](#design-schematic)
 * [Circuit Setup](#circuit-setup)
 * [Status](#status)
 * [Contact](#contact)
@@ -14,8 +15,11 @@ The purpose of this project is to explore the PID algorithm with the Atmega328 u
 ## Technologies
 * ArduinoIDE- version 1.8.13
 
+## Design Schematic
+![Schematic](schematic.PNG)
+
 ## Circuit Setup
-![TinkerCad](Capture.PNG)
+![Set Up](setup.PNG)
 
 ## Status
 Project is: _finished_
