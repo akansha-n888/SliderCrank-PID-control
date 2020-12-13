@@ -17,9 +17,11 @@ The purpose of this project is to explore the PID algorithm with the Atmega328 u
 
 ## Design Schematic
 ![Schematic](schematic.PNG)
+> Schematic for Slider Crank Mechanism
 
 ## Circuit Setup
 ![Set Up](setup.PNG)
+> Mechanical & Electrical Set Up
 
 ## Status
 Project is: _finished_
